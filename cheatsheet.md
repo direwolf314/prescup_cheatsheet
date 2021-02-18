@@ -210,7 +210,41 @@
 * Assume all users are using the same box as your analysis box. If you want some info - replace your entire Program Files\whatever_program directory with theirs
 * log2timeline –r –p –z <system-timezone> –f <type-input> /mnt/windows_mount –w timeline.csv
 
-### Windows
+## Misc Windows Forensics/Defense
+* Check c:\Windows\prefetch
+    * `powershell /c "dir C:\Windows\Prefetch\ | Sort -Descending -Property LastWriteTime | select -First 50"`
+* Powershell
+    * If you need to compare boxes (processes, firewalls, scheduled tasks, wmi subsribers, etc)
+        * `psexec \\server01,server02 -s powershell Enable-PSRemoting -Force`
+        * `$s1, $s2 = New-PSSession -ComputerName Server01,Server02`
+        * Processes
+            * `$p1 = Invoke-Command -Session $s1 -ScriptBlock {Get-Process}`
+            * `$p2 = Invoke-Command -Session $s2 -ScriptBlock {Get-Process}`
+            * `Compare-Object $p1 $p2 -Property name`
+        * WMI Subscribers
+            * `$p1 = Invoke-Command -Session $s1 -ScriptBlock {Get-WmiObject -Namespace root\Subscription -Class __EventFilter}`
+            * `$p2 = Invoke-Command -Session $s2 -ScriptBlock {Get-WmiObject -Namespace root\Subscription -Class __EventFilter}`
+            * `Compare-Object $p1 $p2 -Property query`
+        * Firewall
+            * `$p1 = Invoke-Command -Session $s1 -ScriptBlock {Get-NetFirewallRule -All}`
+            * `$p2 = Invoke-Command -Session $s2 -ScriptBlock {Get-NetFirewallRule -All}`
+            * `Compare-Object $p1 $p2 -Property name`
+        * Schedule Tasks
+            * `$p1 = Invoke-Command -Session $s1 -ScriptBlock {Get-ScheduledTask}`
+            * `$p2 = Invoke-Command -Session $s2 -ScriptBlock {Get-ScheduledTask}`
+            * `Compare-Object $p1 $p2 -Property TaskName`
+* List most recently modified firewall rules
+    $Events = Get-WinEvent -ErrorAction SilentlyContinue -FilterHashtable @{logname="Microsoft-Windows-Windows Firewall With Advanced Security/Firewall"; id=2004}
+    ForEach ($Event in $Events) {
+        $eventXML = [xml]$Event.ToXml()
+        For ($i=0; $i -lt $eventXML.Event.EventData.Data.Count; $i++) {
+            Add-Member -InputObject $Event -MemberType NoteProperty -Force `
+                -Name  $eventXML.Event.EventData.Data[$i].name `
+                -Value $eventXML.Event.EventData.Data[$i].'#text'
+        }
+    }
+    $Events | Format-Table -Property TimeCreated,RuleName -AutoSize
+* If you need to find reg keys - use regedit to export them and look at last modified timestamp
 * Procmon:
     * Filter - Process Name is blah.exe then Include
     * Filter - Use Path contains c:\Users\student\desktop\Challenge\ then include

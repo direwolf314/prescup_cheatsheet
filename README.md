@@ -177,6 +177,26 @@
 ## Memory Forensics
 
 ### SIFT
+* Make a ramdisk to speed up analysis
+    * mkdir /mnt/ramdisk
+    * mount -t tmpfs -o size=2048m tmpfs /mnt/ramdisk
+* vol.py command –f /path/to/windows_xp_memory.img --profile=WinXPSP3x86
+    * https://book.hacktricks.xyz/forensics/volatility-examples
+    * > imageinfo (help identify profile) <- run this immediately - it will take time
+    * > pslist / pstree
+    * > psscan <- more in-depth
+    * > netscan / connections / connscan / sockets
+    * > cmdline
+    * > consoles
+    * > procdump --pid=1234 --dump-dir="`pwd`"
+    * > memdump -p 1234 --dump-dir="`pwd`"
+    * > dumpfiles -p 1234 --dump-dir="`pwd`" -n
+    * > notepad
+    * > clipboard
+    * > timeliner
+    * > svcscan
+    * > ... more -- see cheatsheet for everything else...
+
 * rekal -f image.vmem
     * > pslist
     * > procinfo <pid>
@@ -206,15 +226,7 @@
     * > malfind <pid>
     * > ldrmodules <pid> verbosity=3   (detect unlinked dlls)
 
-* vol.py command –f /path/to/windows_xp_memory.img --profile=WinXPSP3x86
-    * > imageinfo (help identify profile) <- run this immediately - it will take time
-    * > pslist
-    * > connscan
-    * > files
-    * > imagecopy
-    * > procdump
-    * > sockscan
-    * > ... more -- see cheatsheet for everything else...
+
 
 ## HDD Forensics
 * Assume all users are using the same box as your analysis box. If you want some info - replace your entire Program Files\whatever_program directory with theirs

@@ -152,9 +152,11 @@
     * https://github.com/activecm/rita
 
 ### SecurityOnion
-* Make sure to convert from pcapng to pcap first vv
-    * so-import-pcap /mnt/hgfs/VMShare/my_pcap.pcap
-* so-reset
+* so-import-pcap /mnt/hgfs/VMShare/my_pcap.pcap
+* Clean up:
+    * so-nsm-clear
+    * so-elastic-clear
+    * so-sensor-clean
 * https://user-images.githubusercontent.com/7849311/57718306-029d5180-764b-11e9-86b9-cf0f69c56ac6.jpg
 * Zeek file extraction:
     * /nsm/zeek/extracted/complete

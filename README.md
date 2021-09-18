@@ -21,7 +21,7 @@
     * Compile every clue and piece of information you've been given along the way and step back after 1 hour
 * Landing on a linux box
     * history
-    * find / -mtime -30 2\>/dev/null
+    * find / -mtime -30 2>/dev/null | grep -v /sys | grep -v /proc | grep -v /var/lib | grep -v /dev | grep -v /run | grep -v /var/cache | grep -v /var/log
     * grep -iR pcup{ .
     * updatedb/locate (special file extensions relevant to challenge, ex. png)
     * cat other users .bash\_history files

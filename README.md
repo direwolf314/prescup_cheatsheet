@@ -26,6 +26,7 @@
     * updatedb/locate (special file extensions relevant to challenge, ex. png)
     * cat other users .bash\_history files
     * sudo -l
+* Try to ssh into every box with user:tartans
 
 # OCO
 

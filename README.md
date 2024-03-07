@@ -152,6 +152,11 @@
     * zeek -r pcap_to_log.pcap local "Log::default_rotation_interval = 1 day"
 * Detect beacons/malicious traffic
     * https://github.com/activecm/rita
+ 
+### Kubernetes
+* kubectl get pods
+* kubectl exec --stdin --tty postgres-587f4b6f7d-hkc8w -- /bin/bash
+
 
 ### SecurityOnion
 * so-import-pcap /mnt/hgfs/VMShare/my_pcap.pcap
